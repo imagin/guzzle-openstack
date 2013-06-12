@@ -5,7 +5,7 @@
 
 namespace Guzzle\Openstack\Common;
 
-use Guzzle\Common\GuzzleException;
+use Guzzle\Common\Exception\GuzzleException;
 
 /**
  * Openstack exception

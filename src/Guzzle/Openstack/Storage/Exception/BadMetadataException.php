@@ -12,7 +12,7 @@
  */
 namespace Guzzle\Openstack\Storage\Exception;
 
-use Guzzle\Common\GuzzleException;
+use Guzzle\Common\Exception\GuzzleException;
 
 class BadMetadataException extends \Exception implements GuzzleException
 {
