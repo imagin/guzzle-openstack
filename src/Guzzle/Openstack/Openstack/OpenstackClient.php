@@ -2,7 +2,7 @@
 
 namespace Guzzle\Openstack\Openstack;
 
-use \Guzzle\Service\Inspector;
+use Guzzle\Common\Collection;
 use Guzzle\Openstack\Identity\IdentityClient;
 use Guzzle\Openstack\Compute\ComputeClient;
 use Guzzle\Openstack\Common\OpenstackException;
@@ -42,7 +42,7 @@ class OpenstackClient extends \Guzzle\Service\Client
 			'region'        => 'RegionOne'
 		);
 		$required = array('auth_url');
-		$config = Inspector::prepareConfig($config, $default, $required);
+		$config = Collection::fromConfig($config, $default, $required);
 
 		$client = new self($config->get('auth_url'), $config->get(
 			'username'

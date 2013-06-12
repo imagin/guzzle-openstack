@@ -5,7 +5,7 @@
 
 namespace Guzzle\Openstack\Identity;
 
-use Guzzle\Service\Inspector;
+use Guzzle\Common\Collection;
 use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Service\Client;
 use Guzzle\Service\Description\XmlDescriptionBuilder;
@@ -29,7 +29,7 @@ class IdentityClient extends AbstractClient
 	{
 		$default = array();
 		$required = array('base_url');
-		$config = Inspector::prepareConfig($config, $default, $required);
+		$config = Collection::fromConfig($config, $default, $required);
 		$client = new self($config->get('base_url'), $config->get('token'));
 		$client->setConfig($config);
 		$client->getEventDispatcher()->addSubscriber(new AuthenticationObserver());
