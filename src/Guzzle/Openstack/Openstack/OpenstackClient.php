@@ -6,6 +6,8 @@ use Guzzle\Common\Collection;
 use Guzzle\Openstack\Identity\IdentityClient;
 use Guzzle\Openstack\Compute\ComputeClient;
 use Guzzle\Openstack\Common\OpenstackException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Guzzle\Openstack\Common\AuthenticationObserver;
 
 /**
  * @license See the LICENSE file that was distributed with this source code.
@@ -32,7 +34,7 @@ class OpenstackClient extends \Guzzle\Service\Client
      *
      * @return \Guzzle\Common\FromConfigInterface|OpenstackClient|\Guzzle\Service\Client
      */
-    public static function factory($config = array())
+    public static function factory($config = array(), EventDispatcherInterface $eventDispatcher = null)
     {
         $default = array(
             'compute_type' => 'compute',
@@ -40,12 +42,18 @@ class OpenstackClient extends \Guzzle\Service\Client
             'storage_type' => 'storage',
             'region' => 'RegionOne'
         );
+        
         $required = array('auth_url');
         $config = Collection::fromConfig($config, $default, $required);
 
-        $client = new self($config->get('auth_url'), $config->get(
-                        'username'
-                ), $config->get('password'), $config->get('tenantName'));
+        $client = new self(
+                $config->get('auth_url'), 
+                $config->get('username'), 
+                $config->get('password'), 
+                $config->get('tenantName'),
+                $eventDispatcher
+        );
+        
         $client->setConfig($config);
 
         return $client;
@@ -56,16 +64,21 @@ class OpenstackClient extends \Guzzle\Service\Client
      *
      * @param string $auth_url URL of the Identity Service
      */
-    public function __construct($auth_url, $username, $password, $tenantName = '')
+    public function __construct($auth_url, $username, $password, $tenantName = '', EventDispatcherInterface $eventDispatcher = null)
     {
         parent::__construct($auth_url);
+        
         $this->auth_url = $auth_url;
         $this->serviceCatalog = array();
-        $this->identityClient = IdentityClient::factory(
-                        array(
-                            'base_url' => $this->auth_url
-                        )
-        );
+        
+        $this->identityClient = IdentityClient::factory(array(
+            'base_url' => $this->auth_url
+        ));
+        
+        $this->setEventDispatcher($eventDispatcher);
+        
+        $this->identityClient->setEventDispatcher($eventDispatcher);
+        $this->identityClient->getEventDispatcher()->addSubscriber(new AuthenticationObserver());
 
         $this->username = $username;
         $this->password = $password;
@@ -90,14 +103,16 @@ class OpenstackClient extends \Guzzle\Service\Client
                 $tenantName
         );
         try {
-            $authResult = $command->execute()->getResult;
+            $authResult = $command->execute();
 
             //Copy Service Catalog
             $this->serviceCatalog = $authResult['access']['serviceCatalog'];
 
             //Get token
-            $this->token = $authResult['access']['token'];
-
+            $this->token = $authResult['access']['token']['id'];
+            
+            $this->identityClient->setToken($this->token);
+            
             //Default Region
             $this->region = 'RegionOne';
         } catch (OpenstackException $e) {
@@ -152,7 +167,7 @@ class OpenstackClient extends \Guzzle\Service\Client
 
     public function getIdentityClient()
     {
-        if (!get_class($this->identityClient) == 'IdentityClient') {
+        if (!$this->identityClient) {
             $this->identityClient = IdentityClient::factory(
                             array(
                                 'username' => $this->username,
