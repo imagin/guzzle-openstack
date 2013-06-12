@@ -24,6 +24,6 @@
         "guzzle/guzzle": "*"
     },
     "autoload": {
-        "psr-0": { "Guzzle/Openstack": "src/" }
+        "psr-0": { "Guzzle\\Openstack": "src/" }
     }
 }
