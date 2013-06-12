@@ -1,9 +1,9 @@
 {
-    "name": "shcloudservices/guzzle-openstack",
+    "name": "imagin/guzzle-openstack",
     "type": "library",
     "description": "PHP Clients for Openstack API",
     "keywords": ["Guzzle", "Openstack"],
-    "homepage": "http://github.com/shcloudservices/guzzle-openstack",
+    "homepage": "http://github.com/imagin/guzzle-openstack",
     "license": "MIT",
     "authors": [
         {
@@ -13,6 +13,10 @@
         {
             "name": "Andreina Romero",
             "email": "andreinar@gmail.com"
+        },
+        {
+            "name": "Antoni Orfin",
+            "email": "aorfin@imagin.pl"
         }        
     ],
     "require": {
