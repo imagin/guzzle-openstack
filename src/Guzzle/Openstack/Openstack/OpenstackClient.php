@@ -165,6 +165,9 @@ class OpenstackClient extends \Guzzle\Service\Client
         }
     }
 
+    /**
+     * @return IdentityClient
+     */
     public function getIdentityClient()
     {
         if (!$this->identityClient) {

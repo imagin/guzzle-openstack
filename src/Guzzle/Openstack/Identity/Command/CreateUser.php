@@ -18,6 +18,18 @@ use Guzzle\Openstack\Common\Command\AbstractJsonCommand;
 class CreateUser extends AbstractJsonCommand {
 
     /**
+     * Set the username
+     *
+     * @param string $username
+     *
+     * @return CreateUser
+     */
+    public function setUserName($username)
+    {
+        return $this->set('username', $username);
+    }
+    
+    /**
      * Set the user name
      *
      * @param string $name
@@ -81,9 +93,10 @@ class CreateUser extends AbstractJsonCommand {
     {       
         $data = array(
             "user" => array(
+                "username"=> $this->get('username'),
                 "name"=> $this->get('name'),
                 "email" => $this->get('email'),
-                "password" => $this->get('password'),
+                "OS-KSADM:password" => $this->get('password'),
                 "tenantId" => $this->get('tenantId')
             )
         );
