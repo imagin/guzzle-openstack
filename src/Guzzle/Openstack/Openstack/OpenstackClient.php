@@ -19,7 +19,8 @@ use Guzzle\Openstack\Common\AuthenticationObserver;
 class OpenstackClient extends \Guzzle\Service\Client
 {
     protected $auth_url, $username, $password, $tenantName, $region, $token;
-    protected $computeClient, $identityClient, $serviceCatalog;
+    protected $computeClient = array(); 
+    protected $identityClient, $serviceCatalog;
 
     /**
      * Factory method to create a new OpenstackClient
@@ -55,7 +56,8 @@ class OpenstackClient extends \Guzzle\Service\Client
         );
         
         $client->setConfig($config);
-
+        $client->region = $config->get('region');
+        
         return $client;
     }
 
@@ -112,9 +114,6 @@ class OpenstackClient extends \Guzzle\Service\Client
             $this->token = $authResult['access']['token']['id'];
             
             $this->identityClient->setToken($this->token);
-            
-            //Default Region
-            $this->region = 'RegionOne';
         } catch (OpenstackException $e) {
             
         }
@@ -177,12 +176,37 @@ class OpenstackClient extends \Guzzle\Service\Client
                                 'password' => $this->password,
                                 'tenantName' => $this->tenantName,
                                 'base_url' => $this->getEndpoint(
-                                        'identity', $this->region, $endpointType
+                                        'identity', $this->region, 'admin'
                                 )
                             )
             );
         }
         return $this->identityClient;
+    }
+
+    /**
+     * @return ComputeClient
+     */
+    public function getComputeClient($tenantId)
+    {
+        if (!isset($this->computeClient[$tenantId])) {
+            var_dump($this->getEndpoint('compute', $this->region, 'admin'));die();
+                    
+            $computeClient = ComputeClient::factory(
+                            array(
+                                'token' => $this->token,
+                                'base_url' => $this->auth_url,
+                                'tenant_id' => $this->tenantName,
+                            )
+            );
+
+            $computeClient->setEventDispatcher($this->getEventDispatcher());
+            $computeClient->getEventDispatcher()->addSubscriber(new AuthenticationObserver());
+
+            $this->computeClient[$tenantId] = $computeClient;
+        }
+
+        return $this->computeClient[$tenantId];
     }
 
     /**
