@@ -96,7 +96,7 @@ class CreateUser extends AbstractJsonCommand {
                 "username"=> $this->get('username'),
                 "name"=> $this->get('name'),
                 "email" => $this->get('email'),
-                "OS-KSADM:password" => $this->get('password'),
+                "password" => $this->get('password'),
                 "tenantId" => $this->get('tenantId')
             )
         );
@@ -105,7 +105,7 @@ class CreateUser extends AbstractJsonCommand {
             $data['user']['enabled'] = $this->get('enabled');
         }
 
-        $body = json_encode($data);        
+        $body = json_encode($data);
         $this->request = $this->client->post('users', null, $body);
     }
 }
