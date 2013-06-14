@@ -17,7 +17,7 @@ class CreateSubnet extends AbstractJsonCommand
     protected function build()
     {
         $body = null;
-        $params = $this->getAll(array('name', 'tenant_id', 'network_id', 'ip_version', 'cidr', 'allocation_pools'));
+        $params = $this->getAll(array('name', 'tenant_id', 'network_id', 'ip_version', 'cidr', 'allocation_pools', 'dns_nameservers'));
 
         if (!empty($params)) {
             $data = array(
