@@ -240,7 +240,7 @@ class OpenstackClient extends \Guzzle\Service\Client
                                 'token' => $this->token,
                                 'base_url' => $this->getEndpoint(
                                     'network', $this->region, 'admin'
-                                ) . 'v2.0/' // . $this->getTenantId() . '/',
+                                ) . 'v2.0/'
                             )
             );
 

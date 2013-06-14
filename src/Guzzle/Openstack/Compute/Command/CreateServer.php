@@ -86,7 +86,9 @@ class CreateServer extends AbstractJsonCommand
             "server" => array(
                 "name" => $this->get('name'),
                 "imageRef" => $this->get('imageRef'),
-                "flavorRef" => $this->get('flavorRef')
+                "flavorRef" => $this->get('flavorRef'),
+                "networks" => array(
+                    array('uuid' => $this->get('nic'))),
             )
         );
 
