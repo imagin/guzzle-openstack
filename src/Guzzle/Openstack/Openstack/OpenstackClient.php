@@ -5,6 +5,7 @@ namespace Guzzle\Openstack\Openstack;
 use Guzzle\Common\Collection;
 use Guzzle\Openstack\Identity\IdentityClient;
 use Guzzle\Openstack\Compute\ComputeClient;
+use Guzzle\Openstack\Network\NetworkClient;
 use Guzzle\Openstack\Common\OpenstackException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Guzzle\Openstack\Common\AuthenticationObserver;
@@ -23,6 +24,7 @@ class OpenstackClient extends \Guzzle\Service\Client
     protected $user;
     protected $computeClient = array(); 
     protected $identityClient, $serviceCatalog;
+    protected $networkClient;
 
     /**
      * Factory method to create a new OpenstackClient
@@ -117,7 +119,7 @@ class OpenstackClient extends \Guzzle\Service\Client
 
             //Copy Service Catalog
             $this->serviceCatalog = $authResult['access']['serviceCatalog'];
-
+//var_dump($this->serviceCatalog);die();
             //Get token
             $this->token = $authResult['access']['token']['id'];
             $this->identityClient->setToken($this->token);
@@ -225,6 +227,28 @@ class OpenstackClient extends \Guzzle\Service\Client
         }
 
         return $this->computeClient[$tenantId];
+    }
+    
+    /**
+     * @return NetworkClient
+     */
+    public function getNetworkClient()
+    {
+        if (!isset($this->networkClient)) {
+            $networkClient = NetworkClient::factory(
+                            array(
+                                'token' => $this->token,
+                                'base_url' => $this->getEndpoint(
+                                    'network', $this->region, 'admin'
+                                ) . 'v2.0/' // . $this->getTenantId() . '/',
+                            )
+            );
+
+            $networkClient->setEventDispatcher($this->getEventDispatcher());
+            $this->networkClient = $networkClient;
+        }
+
+        return $this->networkClient;
     }
 
     /**
