@@ -90,17 +90,17 @@ class CreateServer extends AbstractJsonCommand
         if($this->hasKey('metadata')){
             $data['server']['metadata'] = $this->get('metadata');
         }
-
+        
         if($this->hasKey('personality')){
-	        $data['server']['personality'] = array();
+            $data['server']['personality'] = array();
+            
             foreach ($this->get('personality') as $value){
                 array_push($data['server']['personality'], $value);
             }
-            
         }
-        $body = json_encode($data);
-        $this->request = $this->client->post($this->client->getTenantId().'/servers', null, $body);
-    
         
+        $body = json_encode($data);
+        
+        $this->request = $this->client->post('servers', null, $body);
     }
 }

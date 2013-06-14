@@ -19,6 +19,8 @@ use Guzzle\Openstack\Common\AuthenticationObserver;
 class OpenstackClient extends \Guzzle\Service\Client
 {
     protected $auth_url, $username, $password, $tenantName, $region, $token;
+    protected $tenant;
+    protected $user;
     protected $computeClient = array(); 
     protected $identityClient, $serviceCatalog;
 
@@ -78,9 +80,9 @@ class OpenstackClient extends \Guzzle\Service\Client
         ));
         
         $this->setEventDispatcher($eventDispatcher);
+        $this->getEventDispatcher()->addSubscriber(new AuthenticationObserver());
         
         $this->identityClient->setEventDispatcher($eventDispatcher);
-        $this->identityClient->getEventDispatcher()->addSubscriber(new AuthenticationObserver());
 
         $this->username = $username;
         $this->password = $password;
@@ -90,7 +92,7 @@ class OpenstackClient extends \Guzzle\Service\Client
     /**
      * Authentication method
      */
-    public function authenticate()
+    public function authenticate($tenantName = null)
     {
         if (isset($this->token)) {
             return;
@@ -98,12 +100,18 @@ class OpenstackClient extends \Guzzle\Service\Client
         
         $username = $this->username;
         $password = $this->password;
-        $tenantName = $this->tenantName;
-
+        
+        if (!$tenantName) {
+            $tenantName = $this->tenantName;
+        } else {
+            $this->tenantName = $tenantName;
+        }
+        
         $command = $this->identityClient->getCommand('Authenticate');
         $command->setUsername($username)->setPassword($password)->setTenantname(
                 $tenantName
         );
+        
         try {
             $authResult = $command->execute();
 
@@ -112,13 +120,25 @@ class OpenstackClient extends \Guzzle\Service\Client
 
             //Get token
             $this->token = $authResult['access']['token']['id'];
-            
             $this->identityClient->setToken($this->token);
+
+            $this->tenant = $authResult['access']['token']['tenant'];
+            $this->user = $authResult['access']['user'];
         } catch (OpenstackException $e) {
             
         }
     }
 
+    public function getTenantId()
+    {
+        return $this->tenant['id'];
+    }
+    
+    public function getUserId()
+    {
+        return $this->user['id'];
+    }
+    
     public function getServiceCatalog()
     {
         return $this->serviceCatalog;
@@ -187,21 +207,20 @@ class OpenstackClient extends \Guzzle\Service\Client
     /**
      * @return ComputeClient
      */
-    public function getComputeClient($tenantId)
+    public function getComputeClient($tenantId = null)
     {
         if (!isset($this->computeClient[$tenantId])) {
-            var_dump($this->getEndpoint('compute', $this->region, 'admin'));die();
-                    
             $computeClient = ComputeClient::factory(
                             array(
                                 'token' => $this->token,
-                                'base_url' => $this->auth_url,
-                                'tenant_id' => $this->tenantName,
+                                'base_url' => $this->getEndpoint(
+                                    'compute', $this->region, 'admin'
+                                ),
+                                'tenant_id' => $tenantId, //$this->tenantName,
                             )
             );
 
             $computeClient->setEventDispatcher($this->getEventDispatcher());
-            $computeClient->getEventDispatcher()->addSubscriber(new AuthenticationObserver());
 
             $this->computeClient[$tenantId] = $computeClient;
         }
