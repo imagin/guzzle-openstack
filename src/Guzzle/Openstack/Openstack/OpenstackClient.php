@@ -207,7 +207,7 @@ class OpenstackClient extends \Guzzle\Service\Client
     /**
      * @return ComputeClient
      */
-    public function getComputeClient($tenantId = null)
+    public function getComputeClient($tenantId = -1)
     {
         if (!isset($this->computeClient[$tenantId])) {
             $computeClient = ComputeClient::factory(
@@ -216,7 +216,6 @@ class OpenstackClient extends \Guzzle\Service\Client
                                 'base_url' => $this->getEndpoint(
                                     'compute', $this->region, 'admin'
                                 ),
-                                'tenant_id' => $tenantId, //$this->tenantName,
                             )
             );
 

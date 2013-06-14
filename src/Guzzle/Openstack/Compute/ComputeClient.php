@@ -31,7 +31,7 @@ class ComputeClient extends AbstractClient
 	public static function factory($config = array())
 	{
 		$default = array();
-		$required = array('base_url', 'token', 'tenant_id');
+		$required = array('base_url', 'token');
 		$config = Collection::fromConfig($config, $default, $required);
 		$client =
 			new self($config->get('base_url'), $config->get('token'), $config->get(

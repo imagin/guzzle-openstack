@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @license See the LICENSE file that was distributed with this source code.
  */
@@ -18,6 +19,7 @@ use Guzzle\Openstack\Common\Command\AbstractJsonCommand;
  */
 class CreateServer extends AbstractJsonCommand
 {
+
     /**
      * Set the servername
      *
@@ -73,34 +75,35 @@ class CreateServer extends AbstractJsonCommand
      *
      * @return CreateServer
      */
-	public function setPersonality($personality){
-		return $this->set('personality', $personality);
-	}
+    public function setPersonality($personality)
+    {
+        return $this->set('personality', $personality);
+    }
 
     protected function build()
     {
         $data = array(
             "server" => array(
-                "name"=> $this->get('name'),
+                "name" => $this->get('name'),
                 "imageRef" => $this->get('imageRef'),
                 "flavorRef" => $this->get('flavorRef')
-                )
-            );
-        
-        if($this->hasKey('metadata')){
+            )
+        );
+
+        if ($this->hasKey('metadata')) {
             $data['server']['metadata'] = $this->get('metadata');
         }
-        
-        if($this->hasKey('personality')){
+
+        if ($this->hasKey('personality')) {
             $data['server']['personality'] = array();
-            
-            foreach ($this->get('personality') as $value){
+
+            foreach ($this->get('personality') as $value) {
                 array_push($data['server']['personality'], $value);
             }
         }
-        
+
         $body = json_encode($data);
-        
+
         $this->request = $this->client->post('servers', null, $body);
     }
 }
