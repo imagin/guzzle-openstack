@@ -15,7 +15,7 @@ class CreateRouter extends AbstractJsonCommand
     protected function build()
     {
         $body = null;
-        $params = $this->getAll(array('tenant_id', 'name', 'admin_state_up'));
+        $params = $this->getAll(array('tenant_id', 'name', 'admin_state_up', 'external_gateway_info'));
 
         if (!empty($params)) {
             $data = array(
