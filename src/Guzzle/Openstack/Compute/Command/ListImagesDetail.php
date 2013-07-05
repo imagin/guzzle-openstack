@@ -82,7 +82,7 @@ class ListImagesDetail extends PaginatedCommand
     
     protected function build()
     {
-        $this->request = $this->client->get($this->client->getTenantId().'/images/detail');
+        $this->request = $this->client->get('images/detail');
 
         if($this->hasKey('server')){
             $this->request->getQuery()->set('server', $this->get('server'));
