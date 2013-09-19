@@ -44,7 +44,7 @@ class ListFlavorsDetail extends PaginatedCommand
     
     protected function build()
     {
-        $this->request = $this->client->get($this->client->getTenantId().'/flavors/detail');
+        $this->request = $this->client->get('flavors/detail');
 
         if($this->hasKey('minDisk')){
             $this->request->getQuery()->set('minDisk', $this->get('minDisk'));
