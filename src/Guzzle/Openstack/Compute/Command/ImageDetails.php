@@ -9,26 +9,26 @@ namespace Guzzle\Openstack\Compute\Command;
 use Guzzle\Openstack\Common\Command\AbstractJsonCommand;
 
 /**
- * Get server details command
+ * Get image details command
  *
- * @guzzle Id doc="Id of the server" required=true
+ * @guzzle Id doc="Id of the image" required=true
  */
-class ServerDetails extends AbstractJsonCommand
+class ImageDetails extends AbstractJsonCommand
 {
 
     /**
-     * Sets the server id
+     * Sets the image id
      * @param type $id
-     * @return type ServerDetails
+     * @return type ImageDetails
      */
     public function setId($id)
     {
-        return $this->set('serverId', $id);
+        return $this->set('imageId', $id);
     }
     
     protected function build()
     {
-        $this->request = $this->client->get('servers/'.$this->get('serverId'));        
+        $this->request = $this->client->get('images/'.$this->get('imageId'));        
     }    
     
 }

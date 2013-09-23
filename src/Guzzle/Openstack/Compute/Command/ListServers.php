@@ -83,7 +83,7 @@ class ListServers extends PaginatedCommand
     
     protected function build()
     {
-        $this->request = $this->client->get($this->client->getTenantId().'/servers'); 
+        $this->request = $this->client->get('servers'); 
         
         if($this->hasKey('image')){
             $this->request->getQuery()->set('image', $this->get('image'));
